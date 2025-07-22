@@ -7,11 +7,16 @@ body {
     height: 100vh;
     font-family: 'DotGothic16', sans-serif;
     color: #FFFFFF;
+    overflow: hidden; /* Prevent scrolling on mobile */
 }
 
 canvas {
     background-color: #000000;
     border: 2px solid #FFFFFF;
+    max-width: 100vw; /* Ensure canvas fits within viewport width */
+    max-height: 100vh; /* Ensure canvas fits within viewport height */
+    width: auto; /* Maintain aspect ratio */
+    height: auto; /* Maintain aspect ratio */
 }
 
 /* Hide default cursor over canvas */

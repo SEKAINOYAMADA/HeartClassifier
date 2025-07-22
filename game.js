@@ -366,7 +366,7 @@ class Game {
         // Draw countdown
         if (this.gameState === 'countdown') {
             this.ctx.fillStyle = COLORS.WHITE;
-            this.ctx.font = `100px ${FONT_FAMILY}`;
+            this.ctx.font = `${100 * (STAGE_WIDTH / 800)}px ${FONT_FAMILY}`;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             const text = this.countdownValue > 0 ? this.countdownValue : 'スタート！';
