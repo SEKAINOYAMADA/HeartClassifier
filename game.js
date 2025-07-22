@@ -140,12 +140,39 @@ class Game {
             }
         });
 
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent default touch behavior (like scrolling)
+            if (this.gameState === 'start') {
+                this.startCountdown();
+            } else if (this.gameState === 'gameover' && Date.now() - this.gameOverStopTime > 3000) {
+                this.resetGame();
+            } else if (this.gameState === 'playing' && !this.heldHeart) {
+                const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+                const touchY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
+                this.mousePos = { x: touchX, y: touchY }; // Use mousePos for touch as well
+                this.grabHeart();
+            }
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (this.heldHeart) {
+                const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+                const touchY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
+                this.mousePos = { x: touchX, y: touchY };
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            if (this.heldHeart) {
+                this.releaseHeart();
+            }
+        });
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Shift' && !this.isShiftDown) {
                 this.isShiftDown = true;
                 this.grabHeart();
-            } else if (this.gameState === 'gameover' && Date.now() - this.gameOverStopTime > 3000) { // Allow restart after 3 seconds
-                this.resetGame();
             }
         });
 
