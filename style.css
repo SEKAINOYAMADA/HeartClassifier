@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    background-color: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'DotGothic16', sans-serif;
+    color: #FFFFFF;
+}
+
+canvas {
+    background-color: #000000;
+    border: 2px solid #FFFFFF;
+}
+
+/* Hide default cursor over canvas */
+canvas:hover {
+    cursor: default;
+}
