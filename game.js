@@ -208,7 +208,7 @@ class Game {
             const dy = heart.y - this.mousePos.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             // Only allow grabbing if not already safe
-            if (!heart.safe && distance < heart.size * 2 && distance < minDistance) {
+            if (!heart.safe && distance < heart.size * 3 && distance < minDistance) { // Increased touch area
                 closestHeart = heart;
                 minDistance = distance;
             }
