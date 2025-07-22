@@ -207,8 +207,18 @@ class Game {
             const dx = heart.x - this.mousePos.x;
             const dy = heart.y - this.mousePos.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            // Only allow grabbing if not already safe
-            if (!heart.safe && distance < heart.size * 3 && distance < minDistance) { // Increased touch area
+
+            const heartHalfWidth = heart.size * 0.75; // Approximate half width of the character
+            const heartHalfHeight = heart.size * 0.75; // Approximate half height of the character
+
+            // Only allow grabbing if not already safe and touch is within heart's bounding box
+            if (!heart.safe &&
+                this.mousePos.x > heart.x - heartHalfWidth &&
+                this.mousePos.x < heart.x + heartHalfWidth &&
+                this.mousePos.y > heart.y - heartHalfHeight &&
+                this.mousePos.y < heart.y + heartHalfHeight &&
+                distance < minDistance
+            ) {
                 closestHeart = heart;
                 minDistance = distance;
             }
