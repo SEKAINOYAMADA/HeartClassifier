@@ -306,16 +306,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         grabHeart() {
-            if (this.gameState !== 'playing' || this.heldHeart) return;
+            console.log("grabHeart() called.");
+            console.log("Current gameState:", this.gameState);
+            console.log("heldHeart:", this.heldHeart);
+
+            if (this.gameState !== 'playing' || this.heldHeart) {
+                console.log("grabHeart() conditions not met. Returning.");
+                return;
+            }
             // Find the closest heart to the mouse
             let closestHeart = null;
             let minDistance = Infinity;
+
+            console.log("Mouse position:", this.mousePos.x, this.mousePos.y);
+            console.log("Number of hearts:", this.hearts.length);
 
             for (let i = this.hearts.length - 1; i >= 0; i--) {
                 const heart = this.hearts[i];
                 const dx = heart.x - this.mousePos.x;
                 const dy = heart.y - this.mousePos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
+                console.log(`Heart ${i}: x=${heart.x}, y=${heart.y}, size=${heart.size}, safe=${heart.safe}, distance=${distance}`);
                 // Only allow grabbing if not already safe
                 if (!heart.safe && distance < heart.size * 2 && distance < minDistance) {
                     closestHeart = heart;
@@ -324,8 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (closestHeart) {
+                console.log("Closest heart found:", closestHeart);
                 this.heldHeart = closestHeart;
                 this.heldHeart.isHeld = true;
+            } else {
+                console.log("No closest heart found within grabbing distance.");
             }
         }
 
