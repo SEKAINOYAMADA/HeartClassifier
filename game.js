@@ -2,15 +2,21 @@ console.log("game.js loaded and running");
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Get references to new HTML elements
     const canvas = document.getElementById('gameCanvas');
+    console.log("canvas:", canvas);
     const ctx = canvas.getContext('2d');
 
-    // Get references to new HTML elements
     const startScreen = document.getElementById('startScreen');
+    console.log("startScreen:", startScreen);
     const startButton = document.getElementById('startButton');
+    console.log("startButton:", startButton);
     const gameOverScreen = document.getElementById('gameOver');
+    console.log("gameOverScreen:", gameOverScreen);
     const finalScoreDisplay = document.getElementById('finalScore');
+    console.log("finalScoreDisplay:", finalScoreDisplay);
     const restartButton = document.getElementById('restartButton');
+    console.log("restartButton:", restartButton);
 
     // --- Game Configuration ---
     const STAGE_WIDTH = 800;
@@ -18,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.width = STAGE_WIDTH;
     canvas.height = STAGE_HEIGHT;
 
-    const FONT_FAMILY = "'DotGothic16', sans-serif"; // Keep this for in-game text if any
+    const FONT_FAMILY = "'Press Start 2P', cursive"; // Changed to match index.html
     const HEART_LIFESPAN = 10; // seconds
 
     const COLORS = {
@@ -90,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (this.y - this.size / 2 < 0 || this.y + this.size / 2 > STAGE_HEIGHT) {
                     this.vy *= -1;
-                    this.y = Math.max(this.size / 2, Math.min(this.y, STAGE_HEIGHT - this.size / 2));
+                    this.y = Math.max(this.y / 2, Math.min(this.y, STAGE_HEIGHT - this.size / 2));
                 }
             }
         }
@@ -116,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     class Game {
-        constructor(ctx) {
+        constructor(ctx, canvasElement, startScreen, startButton, gameOverScreen, finalScoreDisplay, restartButton) {
             this.ctx = ctx;
             this.gameState = 'start'; // 'start', 'countdown', 'playing', 'gameover'
             this.hearts = [];
@@ -144,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.gameOverScreen = gameOverScreen;
             this.finalScoreDisplay = finalScoreDisplay;
             this.restartButton = restartButton;
-            this.canvasElement = canvas; // Reference to the canvas DOM element
+            this.canvasElement = canvasElement; // Reference to the canvas DOM element
 
             this.initEventListeners();
             this.showStartScreen(); // Show start screen initially
@@ -443,6 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Main Execution ---
-    const game = new Game(ctx);
+    const game = new Game(ctx, canvas, startScreen, startButton, gameOverScreen, finalScoreDisplay, restartButton);
     game.loop();
 });
