@@ -216,11 +216,9 @@ class Game {
                 this.mousePos.x > heart.x - heartHalfWidth &&
                 this.mousePos.x < heart.x + heartHalfWidth &&
                 this.mousePos.y > heart.y - heartHalfHeight &&
-                this.mousePos.y < heart.y + heartHalfHeight
+                this.mousePos.y < heart.y + heartHalfHeight &&
+                distance < minDistance
             ) {
-                closestHeart = heart;
-                minDistance = distance;
-            }
                 closestHeart = heart;
                 minDistance = distance;
             }
