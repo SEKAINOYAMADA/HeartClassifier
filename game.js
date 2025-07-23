@@ -1,7 +1,15 @@
+console.log("game.js loaded and running");
 "use strict";
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// Get references to new HTML elements
+const startScreen = document.getElementById('startScreen');
+const startButton = document.getElementById('startButton');
+const gameOverScreen = document.getElementById('gameOver');
+const finalScoreDisplay = document.getElementById('finalScore');
+const restartButton = document.getElementById('restartButton');
 
 // --- Game Configuration ---
 const STAGE_WIDTH = 800;
@@ -9,7 +17,7 @@ const STAGE_HEIGHT = 600;
 canvas.width = STAGE_WIDTH;
 canvas.height = STAGE_HEIGHT;
 
-const FONT_FAMILY = "'DotGothic16', sans-serif";
+const FONT_FAMILY = "'DotGothic16', sans-serif"; // Keep this for in-game text if any
 const HEART_LIFESPAN = 10; // seconds
 
 const COLORS = {
@@ -128,24 +136,28 @@ class Game {
 
         this.isShiftDown = false;
         this.mousePos = { x: 0, y: 0 };
+
+        // References to HTML elements
+        this.startScreen = startScreen;
+        this.startButton = startButton;
+        this.gameOverScreen = gameOverScreen;
+        this.finalScoreDisplay = finalScoreDisplay;
+        this.restartButton = restartButton;
+        this.canvasElement = canvas; // Reference to the canvas DOM element
+
         this.initEventListeners();
+        this.showStartScreen(); // Show start screen initially
     }
 
     initEventListeners() {
-        canvas.addEventListener('click', () => {
-            if (this.gameState === 'start') {
-                this.startCountdown();
-            } else if (this.gameState === 'gameover' && Date.now() - this.gameOverStopTime > 3000) { // Allow restart after 3 seconds
-                this.resetGame();
-            }
-        });
+        this.startButton.addEventListener('click', this.startGame.bind(this));
+        this.restartButton.addEventListener('click', this.resetGame.bind(this));
+
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Shift' && !this.isShiftDown) {
                 this.isShiftDown = true;
                 this.grabHeart();
-            } else if (this.gameState === 'gameover' && Date.now() - this.gameOverStopTime > 3000) { // Allow restart after 3 seconds
-                this.resetGame();
             }
         });
 
@@ -156,12 +168,40 @@ class Game {
             }
         });
 
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
+        this.canvasElement.addEventListener('mousemove', (e) => {
+            const rect = this.canvasElement.getBoundingClientRect();
             this.mousePos.x = e.clientX - rect.left;
             this.mousePos.y = e.clientY - rect.top;
         });
     }
+
+    startGame() {
+        this.hideStartScreen();
+        this.startCountdown();
+    }
+
+    showStartScreen() {
+        this.startScreen.style.display = 'flex'; // Assuming it's flex for centering
+        this.canvasElement.style.display = 'none';
+        this.gameOverScreen.style.display = 'none';
+    }
+
+    hideStartScreen() {
+        this.startScreen.style.display = 'none';
+        this.canvasElement.style.display = 'block'; // Canvas should be block for display
+    }
+
+    showGameOverScreen() {
+        this.gameOverScreen.style.display = 'flex'; // Assuming it's flex for centering
+        this.canvasElement.style.display = 'none';
+        this.finalScoreDisplay.textContent = this.score;
+    }
+
+    hideGameOverScreen() {
+        this.gameOverScreen.style.display = 'none';
+        this.canvasElement.style.display = 'block';
+    }
+
 
     startCountdown() {
         this.gameState = 'countdown';
@@ -276,7 +316,6 @@ class Game {
             this.spawnHearts();
             this.updateHeartSafety();
             this.checkGameOver();
-            // this.checkAreaClear(); // Removed as per user request
         } else if (this.gameState === 'countdown') {
             if (now - this.lastCountdownTime > 1000) {
                 this.countdownValue--;
@@ -304,6 +343,7 @@ class Game {
             this.highScore = this.score;
             localStorage.setItem('heartSurvivorHighScore', this.highScore);
         }
+        this.showGameOverScreen(); // Show game over screen
     }
 
     checkGameOver() {
@@ -345,33 +385,26 @@ class Game {
         this.ctx.fillStyle = COLORS.BLACK;
         this.ctx.fillRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 
-        if (this.gameState === 'start') {
-            this.drawStartScreen();
-            return;
-        }
-        
-        if (this.gameState === 'gameover') {
-            this.drawGameOver();
-            return;
-        }
+        // Only draw game elements if playing or in countdown
+        if (this.gameState === 'playing' || this.gameState === 'countdown') {
+            // Draw areas and spawners
+            this.drawZones();
 
-        // Draw areas and spawners
-        this.drawZones();
-        
-        // Draw hearts
-        this.hearts.forEach(heart => heart.draw(this.ctx));
+            // Draw hearts
+            this.hearts.forEach(heart => heart.draw(this.ctx));
 
-        // Draw countdown
-        if (this.gameState === 'countdown') {
-            this.ctx.fillStyle = COLORS.WHITE;
-            this.ctx.font = `100px ${FONT_FAMILY}`;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            const text = this.countdownValue > 0 ? this.countdownValue : 'スタート！';
-            this.ctx.fillText(text, STAGE_WIDTH / 2, STAGE_HEIGHT / 2);
+            // Draw countdown
+            if (this.gameState === 'countdown') {
+                this.ctx.fillStyle = COLORS.WHITE;
+                this.ctx.font = `100px ${FONT_FAMILY}`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                const text = this.countdownValue > 0 ? this.countdownValue : 'スタート！';
+                this.ctx.fillText(text, STAGE_WIDTH / 2, STAGE_HEIGHT / 2);
+            }
         }
     }
-    
+
     drawZones() {
         // Red Area
         this.ctx.fillStyle = COLORS.RED_AREA;
@@ -387,63 +420,6 @@ class Game {
         this.ctx.strokeRect(this.lowerSpawn.x, this.lowerSpawn.y, this.lowerSpawn.width, this.lowerSpawn.height);
     }
 
-    drawStartScreen() {
-        this.ctx.fillStyle = COLORS.WHITE;
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-
-        this.ctx.font = `48px ${FONT_FAMILY}`;
-        this.ctx.fillText('タッチしてスタート', STAGE_WIDTH / 2, STAGE_HEIGHT / 2 - 80);
-
-        this.ctx.font = `24px ${FONT_FAMILY}`;
-        this.ctx.fillText('カーソルをハートに合わせて', STAGE_WIDTH / 2, STAGE_HEIGHT / 2 + 20);
-        this.ctx.fillText('SHIFTボタンで掴む', STAGE_WIDTH / 2, STAGE_HEIGHT / 2 + 60);
-        this.ctx.fillText('SHIFTボタンを離して放す', STAGE_WIDTH / 2, STAGE_HEIGHT / 2 + 100);
-    }
-
-    drawGameOver() {
-        const now = Date.now();
-        const elapsed = now - this.gameOverStopTime;
-
-        // Draw the game state as it was at the moment of explosion
-        this.drawZones();
-        this.hearts.forEach(heart => {
-            if (heart === this.explodingHeart) {
-                this.ctx.font = `${heart.size * 3}px ${FONT_FAMILY}`;
-                this.ctx.fillStyle = heart.color; // Use the heart's actual color
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText('×', heart.x, heart.y);
-            } else {
-                heart.draw(this.ctx);
-            }
-        });
-        this.ctx.fillStyle = COLORS.WHITE;
-        this.ctx.font = `24px ${FONT_FAMILY}`;
-        this.ctx.textAlign = 'left';
-        this.ctx.textBaseline = 'top';
-
-        // After 3 seconds, show game over text
-        if (elapsed > 3000) {
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            this.ctx.fillRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
-            
-            this.ctx.fillStyle = COLORS.WHITE;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-
-            this.ctx.font = `80px ${FONT_FAMILY}`;
-            this.ctx.fillText('ゲームオーバー', STAGE_WIDTH / 2, STAGE_HEIGHT / 2 - 50);
-
-            this.ctx.font = `40px ${FONT_FAMILY}`;
-            this.ctx.fillText(`SCORE: ${this.score}`, STAGE_WIDTH / 2, STAGE_HEIGHT / 2 + 20);
-            this.ctx.fillText(`HIGH SCORE: ${this.highScore}`, STAGE_WIDTH / 2, STAGE_HEIGHT / 2 + 70);
-
-            this.ctx.font = `24px ${FONT_FAMILY}`;
-            this.ctx.fillText('クリックまたは任意のキーで再スタート', STAGE_WIDTH / 2, STAGE_HEIGHT / 2 + 150);
-        }
-    }
-
     resetGame() {
         this.gameState = 'start';
         this.hearts = [];
@@ -455,6 +431,7 @@ class Game {
         this.gameOverStopTime = 0;
         this.lastCountdownTime = 0;
         this.explodingHeart = null;
+        this.showStartScreen(); // Show start screen after reset
     }
 
     loop() {
