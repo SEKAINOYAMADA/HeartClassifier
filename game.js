@@ -136,10 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.lastCountdownTime = 0;
             this.explodingHeart = null;
 
-            this.redArea = { x: 0, y: STAGE_HEIGHT / 2 - 150, width: 100, height: 300 };
-            this.blueArea = { x: STAGE_WIDTH - 100, y: STAGE_HEIGHT / 2 - 150, width: 100, height: 300 };
-            this.upperSpawn = { x: STAGE_WIDTH / 2 - 50, y: 0, width: 100, height: 50 };
-            this.lowerSpawn = { x: STAGE_WIDTH / 2 - 50, y: STAGE_HEIGHT - 50, width: 100, height: 50 };
+            // Adjusted area positions for better layout
+            this.redArea = { x: 50, y: STAGE_HEIGHT / 2 - 100, width: 100, height: 200 };
+            this.blueArea = { x: STAGE_WIDTH - 150, y: STAGE_HEIGHT / 2 - 100, width: 100, height: 200 };
+            this.upperSpawn = { x: STAGE_WIDTH / 2 - 75, y: 50, width: 150, height: 50 };
+            this.lowerSpawn = { x: STAGE_WIDTH / 2 - 75, y: STAGE_HEIGHT - 100, width: 150, height: 50 };
 
             this.isShiftDown = false;
             this.mousePos = { x: 0, y: 0 };
@@ -201,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showGameOverScreen() {
             this.gameOverScreen.style.display = 'flex'; // Assuming it's flex for centering
             this.canvasElement.style.display = 'none';
-            this.finalScoreDisplay.textContent = this.score;
+            this.finalScoreDisplay.innerHTML = `SCORE: ${this.score}<br>HIGH SCORE: ${this.highScore}`;
         }
 
         hideGameOverScreen() {
