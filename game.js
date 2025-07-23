@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("finalScoreDisplay:", finalScoreDisplay);
     const restartButton = document.getElementById('restartButton');
     console.log("restartButton:", restartButton);
+    const highScoreList = document.getElementById('highScoreList'); // New element
 
     // --- Game Configuration ---
     const STAGE_WIDTH = 800;
@@ -122,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     class Game {
-        constructor(ctx, canvasElement, startScreen, startButton, gameOverScreen, finalScoreDisplay, restartButton) {
+        constructor(ctx, canvasElement, startScreen, startButton, gameOverScreen, finalScoreDisplay, restartButton, highScoreList) {
             this.ctx = ctx;
             this.gameState = 'start'; // 'start', 'countdown', 'playing', 'gameover'
             this.hearts = [];
@@ -179,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.finalScoreDisplay = finalScoreDisplay;
             this.restartButton = restartButton;
             this.canvasElement = canvasElement; // Reference to the canvas DOM element
+            this.highScoreList = highScoreList; // New element
 
             this.initEventListeners();
             this.showStartScreen(); // Show start screen initially
@@ -226,10 +228,26 @@ document.addEventListener('DOMContentLoaded', () => {
             this.canvasElement.style.display = 'block'; // Canvas should be block for display
         }
 
-        showGameOverScreen() {
+        async showGameOverScreen() {
             this.gameOverScreen.style.display = 'flex'; // Assuming it's flex for centering
             this.canvasElement.style.display = 'none';
-            this.finalScoreDisplay.innerHTML = `SCORE: ${this.score}<br>HIGH SCORE: ${this.highScore}`;
+            
+            // Display current score and personal high score
+            this.finalScoreDisplay.innerHTML = `YOUR SCORE: ${this.score}<br>YOUR HIGH SCORE: ${this.highScore}`;
+
+            // Prompt for player name if score is in top 5
+            const topScores = await this.fetchTopScores();
+            const isTop5 = topScores.some(s => this.score > s.score) || topScores.length < 5;
+
+            if (isTop5) {
+                let playerName = prompt("Congratulations! You made it to the Top 5!\nPlease enter your name:");
+                if (playerName) {
+                    await this.saveScore(playerName, this.score);
+                }
+            }
+
+            // Fetch and display updated top scores
+            await this.displayTopScores();
         }
 
         hideGameOverScreen() {
@@ -237,6 +255,42 @@ document.addEventListener('DOMContentLoaded', () => {
             this.canvasElement.style.display = 'block';
         }
 
+        async saveScore(playerName, score) {
+            try {
+                const response = await fetch('http://localhost:3000/api/scores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ playerName, score }),
+                });
+                const data = await response.json();
+                console.log('Score saved:', data);
+            } catch (error) {
+                console.error('Error saving score:', error);
+            }
+        }
+
+        async fetchTopScores() {
+            try {
+                const response = await fetch('http://localhost:3000/api/scores/top5');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching top scores:', error);
+                return [];
+            }
+        }
+
+        async displayTopScores() {
+            const topScores = await this.fetchTopScores();
+            this.highScoreList.innerHTML = ''; // Clear previous list
+            topScores.forEach((s, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${index + 1}. ${s.playerName}: ${s.score}`;
+                this.highScoreList.appendChild(listItem);
+            });
+        }
 
         startCountdown() {
             this.gameState = 'countdown';
@@ -482,6 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Main Execution ---
-    const game = new Game(ctx, canvas, startScreen, startButton, gameOverScreen, finalScoreDisplay, restartButton);
+    const game = new Game(ctx, canvas, startScreen, startButton, gameOverScreen, finalScoreDisplay, restartButton, highScoreList);
     game.loop();
 });
