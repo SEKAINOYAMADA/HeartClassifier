@@ -4,21 +4,14 @@ console.log("game.js loaded and running");
 document.addEventListener('DOMContentLoaded', () => {
     // Get references to new HTML elements
     const canvas = document.getElementById('gameCanvas');
-    console.log("canvas:", canvas);
     const ctx = canvas.getContext('2d');
 
     const startScreen = document.getElementById('startScreen');
-    console.log("startScreen:", startScreen);
     const startButton = document.getElementById('startButton');
-    console.log("startButton:", startButton);
     const gameOverScreen = document.getElementById('gameOver');
-    console.log("gameOverScreen:", gameOverScreen);
     const finalScoreDisplay = document.getElementById('finalScore');
-    console.log("finalScoreDisplay:", finalScoreDisplay);
     const restartButton = document.getElementById('restartButton');
-    console.log("restartButton:", restartButton);
     const highScoreList = document.getElementById('highScoreList'); // New element
-    console.log("highScoreList:", highScoreList);
 
     // --- Game Configuration ---
     const STAGE_WIDTH = 800;
@@ -243,10 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Prompt for player name if score is in top 5
             const topScores = await this.fetchTopScores();
-            console.log("Fetched top scores:", topScores);
             const isTop5 = topScores.some(s => this.score > s.score) || topScores.length < 5;
-            console.log("Current score:", this.score);
-            console.log("isTop5 evaluation:", isTop5);
 
             if (isTop5) {
                 let playerName = prompt("Congratulations! You made it to the Top 5!\nPlease enter your name:");
@@ -323,7 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dy = heart.y - this.mousePos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (!heart.safe && distance < heart.size * 2 && distance < minDistance) {
+                // Adjusted grabbing distance for touch
+                if (!heart.safe && distance < heart.size * 3 && distance < minDistance) { // Increased grab radius
                     closestHeart = heart;
                     minDistance = distance;
                 }
