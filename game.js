@@ -140,35 +140,6 @@ class Game {
             }
         });
 
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent default touch behavior (like scrolling)
-            if (this.gameState === 'start') {
-                this.startCountdown();
-            } else if (this.gameState === 'gameover' && Date.now() - this.gameOverStopTime > 3000) {
-                this.resetGame();
-            } else if (this.gameState === 'playing' && !this.heldHeart) {
-                const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
-                const touchY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
-                this.mousePos = { x: touchX, y: touchY }; // Use mousePos for touch as well
-                this.grabHeart();
-            }
-        });
-
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (this.heldHeart) {
-                const touchX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
-                const touchY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
-                this.mousePos = { x: touchX, y: touchY };
-            }
-        });
-
-        canvas.addEventListener('touchend', () => {
-            if (this.heldHeart) {
-                this.releaseHeart();
-            }
-        });
-
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Shift' && !this.isShiftDown) {
                 this.isShiftDown = true;
@@ -209,17 +180,8 @@ class Game {
             const dx = heart.x - this.mousePos.x;
             const dy = heart.y - this.mousePos.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-
-            const heartHalfWidth = heart.size * 0.75; // Approximate half width of the character
-            const heartHalfHeight = heart.size * 0.75; // Approximate half height of the character
-
-            // Only allow grabbing if not already safe and touch is within heart's bounding box
-            if (!heart.safe &&
-                this.mousePos.x > heart.x - heartHalfWidth &&
-                this.mousePos.x < heart.x + heartHalfWidth &&
-                this.mousePos.y > heart.y - heartHalfHeight &&
-                this.mousePos.y < heart.y + heartHalfHeight
-            ) {
+            // Only allow grabbing if not already safe
+            if (!heart.safe && distance < heart.size * 2 && distance < minDistance) {
                 closestHeart = heart;
                 minDistance = distance;
             }
@@ -324,8 +286,6 @@ class Game {
                     this.lastSpawnTime = now;
                 }
             }
-        } else if (this.gameState === 'gameover') {
-            // No update needed, waiting for user click
         }
     }
 
@@ -404,7 +364,7 @@ class Game {
         // Draw countdown
         if (this.gameState === 'countdown') {
             this.ctx.fillStyle = COLORS.WHITE;
-            this.ctx.font = `${100 * (STAGE_WIDTH / 800)}px ${FONT_FAMILY}`;
+            this.ctx.font = `100px ${FONT_FAMILY}`;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             const text = this.countdownValue > 0 ? this.countdownValue : 'スタート！';
