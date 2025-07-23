@@ -456,28 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         drawStartScreen() {
-            this.ctx.fillStyle = COLORS.WHITE;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-
-            // Adjust font size and line spacing for better readability
-            let currentY = STAGE_HEIGHT / 2 - 100; // Starting Y position
-            const lineHeight = 40; // Space between lines
-
-            this.ctx.font = `28px ${FONT_FAMILY}`;
-            this.ctx.fillText('WASD or Arrow Keys to Move', STAGE_WIDTH / 2, currentY);
-            currentY += lineHeight;
-
-            this.ctx.fillText('Touch & Drag on Mobile', STAGE_WIDTH / 2, currentY);
-            currentY += lineHeight;
-
-            this.ctx.fillText('カーソルをハートに合わせて', STAGE_WIDTH / 2, currentY);
-            currentY += lineHeight;
-
-            this.ctx.fillText('SHIFTボタンで掴む', STAGE_WIDTH / 2, currentY);
-            currentY += lineHeight;
-
-            this.ctx.fillText('SHIFTボタンを離して放す', STAGE_WIDTH / 2, currentY);
+            // This method is now handled by HTML/CSS for startScreen element
+            // No drawing on canvas needed here.
         }
 
         resetGame() {
