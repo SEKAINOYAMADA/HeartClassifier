@@ -9,21 +9,25 @@ body {
     font-family: 'Press Start 2P', cursive; /* Updated font family */
     color: #FFFFFF;
     overflow: hidden; /* Prevent scrolling on mobile */
+    position: relative; /* Added for absolute positioning context */
 }
 
 h1 {
     text-align: center;
     color: #FFFFFF;
     margin-bottom: 20px; /* Space between title and canvas/start screen */
+    z-index: 1; /* Ensure it's above canvas if canvas is block */
 }
 
 canvas {
     background-color: #000000;
     border: 2px solid #FFFFFF;
-    max-width: 100vw; /* Ensure canvas fits within viewport width */
-    max-height: 100vh; /* Ensure canvas fits within viewport height */
-    width: auto; /* Maintain aspect ratio */
-    height: auto; /* Maintain aspect ratio */
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    display: block; /* Ensure it behaves as a block element for centering */
+    z-index: 0; /* Ensure it's below overlays */
 }
 
 /* Hide default cursor over canvas */
@@ -34,23 +38,32 @@ canvas:hover {
 #startScreen,
 #gameOver {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0; /* Changed from 50% */
+    left: 0; /* Changed from 50% */
+    width: 100%; /* Ensure full width */
+    height: 100%; /* Ensure full height */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
-    border-radius: 10px;
-    z-index: 10; /* Ensure it's above canvas */
+    box-sizing: border-box; /* Include padding in width/height */
+    z-index: 10;
+}
+
+/* Styles for content within startScreen and gameOver */
+#startScreen h1,
+#gameOver h2 {
+    font-size: 2.5em; /* Adjust as needed */
+    margin-bottom: 20px;
 }
 
 #startScreen p,
 #gameOver p {
     margin: 10px 0;
+    font-size: 1.1em; /* Adjust as needed */
 }
 
 #startButton,
