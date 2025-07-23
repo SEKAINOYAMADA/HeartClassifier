@@ -136,11 +136,38 @@ document.addEventListener('DOMContentLoaded', () => {
             this.lastCountdownTime = 0;
             this.explodingHeart = null;
 
-            // Adjusted area positions for better layout
-            this.redArea = { x: 50, y: STAGE_HEIGHT / 2 - 100, width: 100, height: 200 };
-            this.blueArea = { x: STAGE_WIDTH - 150, y: STAGE_HEIGHT / 2 - 100, width: 100, height: 200 };
-            this.upperSpawn = { x: STAGE_WIDTH / 2 - 75, y: 50, width: 150, height: 50 };
-            this.lowerSpawn = { x: STAGE_WIDTH / 2 - 75, y: STAGE_HEIGHT - 100, width: 150, height: 50 };
+            // Adjusted area positions for better layout (centered)
+            const areaWidth = 100;
+            const areaHeight = 200;
+            const spawnWidth = 150;
+            const spawnHeight = 50;
+            const horizontalPadding = 100; // Padding from center for red/blue areas
+            const verticalPadding = 50; // Padding from top/bottom for spawn areas
+
+            this.redArea = { 
+                x: STAGE_WIDTH / 2 - areaWidth - horizontalPadding / 2, 
+                y: STAGE_HEIGHT / 2 - areaHeight / 2, 
+                width: areaWidth, 
+                height: areaHeight 
+            };
+            this.blueArea = { 
+                x: STAGE_WIDTH / 2 + horizontalPadding / 2, 
+                y: STAGE_HEIGHT / 2 - areaHeight / 2, 
+                width: areaWidth, 
+                height: areaHeight 
+            };
+            this.upperSpawn = { 
+                x: STAGE_WIDTH / 2 - spawnWidth / 2, 
+                y: verticalPadding, 
+                width: spawnWidth, 
+                height: spawnHeight 
+            };
+            this.lowerSpawn = { 
+                x: STAGE_WIDTH / 2 - spawnWidth / 2, 
+                y: STAGE_HEIGHT - spawnHeight - verticalPadding, 
+                width: spawnWidth, 
+                height: spawnHeight 
+            };
 
             this.isShiftDown = false;
             this.mousePos = { x: 0, y: 0 };
@@ -426,6 +453,31 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ctx.lineWidth = 2;
             this.ctx.strokeRect(this.upperSpawn.x, this.upperSpawn.y, this.upperSpawn.width, this.upperSpawn.height);
             this.ctx.strokeRect(this.lowerSpawn.x, this.lowerSpawn.y, this.lowerSpawn.width, this.lowerSpawn.height);
+        }
+
+        drawStartScreen() {
+            this.ctx.fillStyle = COLORS.WHITE;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+
+            // Adjust font size and line spacing for better readability
+            let currentY = STAGE_HEIGHT / 2 - 100; // Starting Y position
+            const lineHeight = 40; // Space between lines
+
+            this.ctx.font = `28px ${FONT_FAMILY}`;
+            this.ctx.fillText('WASD or Arrow Keys to Move', STAGE_WIDTH / 2, currentY);
+            currentY += lineHeight;
+
+            this.ctx.fillText('Touch & Drag on Mobile', STAGE_WIDTH / 2, currentY);
+            currentY += lineHeight;
+
+            this.ctx.fillText('カーソルをハートに合わせて', STAGE_WIDTH / 2, currentY);
+            currentY += lineHeight;
+
+            this.ctx.fillText('SHIFTボタンで掴む', STAGE_WIDTH / 2, currentY);
+            currentY += lineHeight;
+
+            this.ctx.fillText('SHIFTボタンを離して放す', STAGE_WIDTH / 2, currentY);
         }
 
         resetGame() {
