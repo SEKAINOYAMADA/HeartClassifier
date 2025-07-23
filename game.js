@@ -211,6 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.mousePos.x = e.clientX - rect.left;
                 this.mousePos.y = e.clientY - rect.top;
             });
+
+            // Touch event listeners for mobile
+            this.canvasElement.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+            this.canvasElement.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+            this.canvasElement.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
         }
 
         startGame() {
@@ -305,29 +310,19 @@ document.addEventListener('DOMContentLoaded', () => {
             this.lastCountdownTime = Date.now();
         }
 
+        // grabHeart() method for both mouse and touch
         grabHeart() {
-            console.log("grabHeart() called.");
-            console.log("Current gameState:", this.gameState);
-            console.log("heldHeart:", this.heldHeart);
+            if (this.gameState !== 'playing' || this.heldHeart) return;
 
-            if (this.gameState !== 'playing' || this.heldHeart) {
-                console.log("grabHeart() conditions not met. Returning.");
-                return;
-            }
-            // Find the closest heart to the mouse
             let closestHeart = null;
             let minDistance = Infinity;
-
-            console.log("Mouse position:", this.mousePos.x, this.mousePos.y);
-            console.log("Number of hearts:", this.hearts.length);
 
             for (let i = this.hearts.length - 1; i >= 0; i--) {
                 const heart = this.hearts[i];
                 const dx = heart.x - this.mousePos.x;
                 const dy = heart.y - this.mousePos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                console.log(`Heart ${i}: x=${heart.x}, y=${heart.y}, size=${heart.size}, safe=${heart.safe}, distance=${distance}`);
-                // Only allow grabbing if not already safe
+
                 if (!heart.safe && distance < heart.size * 2 && distance < minDistance) {
                     closestHeart = heart;
                     minDistance = distance;
@@ -335,14 +330,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (closestHeart) {
-                console.log("Closest heart found:", closestHeart);
                 this.heldHeart = closestHeart;
                 this.heldHeart.isHeld = true;
-            } else {
-                console.log("No closest heart found within grabbing distance.");
             }
         }
 
+        // releaseHeart() method for both mouse and touch
         releaseHeart() {
             if (this.heldHeart) {
                 const releasedHeart = this.heldHeart;
@@ -369,6 +362,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+        }
+
+        // New touch event handlers
+        handleTouchStart(e) {
+            e.preventDefault(); // Prevent default touch behavior (scrolling, zooming)
+            const touch = e.touches[0];
+            const rect = this.canvasElement.getBoundingClientRect();
+            this.mousePos.x = touch.clientX - rect.left;
+            this.mousePos.y = touch.clientY - rect.top;
+
+            this.grabHeart(); // Use existing grabHeart logic
+        }
+
+        handleTouchMove(e) {
+            e.preventDefault(); // Prevent default touch behavior
+            const touch = e.touches[0];
+            const rect = this.canvasElement.getBoundingClientRect();
+            this.mousePos.x = touch.clientX - rect.left;
+            this.mousePos.y = touch.clientY - rect.top;
+
+            if (this.heldHeart) {
+                this.heldHeart.x = this.mousePos.x;
+                this.heldHeart.y = this.mousePos.y;
+            }
+        }
+
+        handleTouchEnd(e) {
+            e.preventDefault(); // Prevent default touch behavior
+            this.releaseHeart(); // Use existing releaseHeart logic
         }
 
         spawnHearts() {
