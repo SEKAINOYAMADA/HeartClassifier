@@ -207,6 +207,7 @@ class Game {
             const dx = heart.x - this.mousePos.x;
             const dy = heart.y - this.mousePos.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
+<<<<<<< HEAD
 
             const heartHalfWidth = heart.size * 0.75; // Approximate half width of the character
             const heartHalfHeight = heart.size * 0.75; // Approximate half height of the character
@@ -216,9 +217,15 @@ class Game {
                 this.mousePos.x > heart.x - heartHalfWidth &&
                 this.mousePos.x < heart.x + heartHalfWidth &&
                 this.mousePos.y > heart.y - heartHalfHeight &&
-                this.mousePos.y < heart.y + heartHalfHeight &&
-                distance < minDistance
+                this.mousePos.y < heart.y + heartHalfHeight
             ) {
+                closestHeart = heart;
+                minDistance = distance;
+            }
+=======
+            // Only allow grabbing if not already safe
+            if (!heart.safe && distance < heart.size * 2 && distance < minDistance) {
+>>>>>>> parent of 2e2f250 (fix: Improve touch grab sensitivity on mobile)
                 closestHeart = heart;
                 minDistance = distance;
             }
