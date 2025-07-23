@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartButton = document.getElementById('restartButton');
     console.log("restartButton:", restartButton);
     const highScoreList = document.getElementById('highScoreList'); // New element
+    console.log("highScoreList:", highScoreList);
 
     // --- Game Configuration ---
     const STAGE_WIDTH = 800;
@@ -237,7 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Prompt for player name if score is in top 5
             const topScores = await this.fetchTopScores();
+            console.log("Fetched top scores:", topScores);
             const isTop5 = topScores.some(s => this.score > s.score) || topScores.length < 5;
+            console.log("Current score:", this.score);
+            console.log("isTop5 evaluation:", isTop5);
 
             if (isTop5) {
                 let playerName = prompt("Congratulations! You made it to the Top 5!\nPlease enter your name:");
@@ -274,6 +278,9 @@ document.addEventListener('DOMContentLoaded', () => {
         async fetchTopScores() {
             try {
                 const response = await fetch('http://localhost:3000/api/scores/top5');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
                 return data;
             } catch (error) {
