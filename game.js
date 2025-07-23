@@ -141,30 +141,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const areaHeight = 200;
             const spawnWidth = 150;
             const spawnHeight = 50;
-            const horizontalPadding = 100; // Padding from center for red/blue areas
-            const verticalPadding = 50; // Padding from top/bottom for spawn areas
-
+            
+            // Safe areas (left and right edges)
             this.redArea = { 
-                x: STAGE_WIDTH / 2 - areaWidth - horizontalPadding / 2, 
+                x: 0, 
                 y: STAGE_HEIGHT / 2 - areaHeight / 2, 
                 width: areaWidth, 
                 height: areaHeight 
             };
             this.blueArea = { 
-                x: STAGE_WIDTH / 2 + horizontalPadding / 2, 
+                x: STAGE_WIDTH - areaWidth, 
                 y: STAGE_HEIGHT / 2 - areaHeight / 2, 
                 width: areaWidth, 
                 height: areaHeight 
             };
+            // Spawn areas (top and bottom edges)
             this.upperSpawn = { 
                 x: STAGE_WIDTH / 2 - spawnWidth / 2, 
-                y: verticalPadding, 
+                y: 0, 
                 width: spawnWidth, 
                 height: spawnHeight 
             };
             this.lowerSpawn = { 
                 x: STAGE_WIDTH / 2 - spawnWidth / 2, 
-                y: STAGE_HEIGHT - spawnHeight - verticalPadding, 
+                y: STAGE_HEIGHT - spawnHeight, 
                 width: spawnWidth, 
                 height: spawnHeight 
             };
